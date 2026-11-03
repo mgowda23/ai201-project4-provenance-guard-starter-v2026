@@ -42,61 +42,43 @@ Two things worth knowing before you pick numbers:
   a **miss**.
 
 ---
-## 1.
+## 1. False positives on my own writing
 
-<!-- Your criterion. It must name a number. -->
+Of 10 pieces I wrote myself, at most 3 may be labeled high-confidence AI, in each of 3 runs.
 
-
-
-**Why this target:**
-
-
+**Why this target:** A wrong accusation costs the writer more than a missed AI post costs the site, so most of my own writing must not be called high-confidence AI. I set the cap at 3 rather than 1 because signal one treats plain, ordinary prose as predictable, and some of my own plain paragraphs may land there. Allowing 5 or more would make the label too easy to hit to mean anything.
 
 ---
 
-## 2.
+## 2. Score spread between clear cases
 
-<!-- Your criterion. -->
+In each of 3 runs, the confidence on `samples/clearly_ai.json` must be at least 0.15 higher than the confidence on `samples/clearly_human.json`.
 
-
-
-**Why this target:**
-
-
+**Why this target:** These two pieces are the clear cases. If their combined scores land within 0.15 of each other, the service is not separating writing I can already tell apart, and the labels on top of that score are a coin flip. The gap is on the combined confidence, not on signal one alone.
 
 ---
 
-## 3.
+## 3. Label coverage
 
-<!-- Your criterion. -->
+Submitting one piece aimed at each band returns all 3 labels, `human`, `ai`, and `unsure`, in each of 3 runs.
 
-
-
-**Why this target:**
-
-
+**Why this target:** A label that no score can reach is a label the service does not have. All three have to come back from real submissions, including the middle one, because a flip at 0.5 is not a confidence score.
 
 ---
 
-## 4.
+## 4. The appeal path
 
-<!-- Your criterion. -->
+An appeal with a real `content_id` and a non-empty reason returns status `under_review` and adds that reason to the log. An unknown id returns 404 and does not add an `under_review` line. I will check this by hand with curl, because `run_eval.py` only posts to `/submit`.
 
-
-
-**Why this target:**
-
-
+**Why this target:** Appeal is the only thing a writer can do when the service accuses them. If the status does not change, or the reason never hits the log, that person has no record and no next step.
 
 ---
 
-## 5.
+## 5. Bad input
 
-<!-- Your criterion. -->
+A missing `text`, an empty `text`, and a `text` longer than 4,000 characters each return 400 and do not add a `decided` log line.
 
-
-
-**Why this target:**
+**Why this target:** A blank or huge body should be rejected, not scored and labeled. The 4,000-character cutoff is the one in the endpoint contract: the model only reads about 400 tokens, and a slice of a long piece must not be judged as if it were the whole piece.
 
 
 
