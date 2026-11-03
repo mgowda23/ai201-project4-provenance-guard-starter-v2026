@@ -54,6 +54,11 @@ DETECTOR_MAX_TOKENS = 400
 # down BEFORE you code it, and to put the numbers in your README. Whatever you
 # decide, it goes here.
 
+# Equal weights. A weighted average stays between the two signals, so a
+# disagreement lands in the middle instead of following the model. Raising the
+# model weight above 0.5 let the generic essay cross 0.65 while style was
+# still near 0.47, which would accuse on one signal.
+
 WEIGHT_MODEL_SIGNAL = 0.5
 WEIGHT_STYLE_SIGNAL = 0.5
 

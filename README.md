@@ -123,7 +123,7 @@ An unknown `content_id` is `404` with `{"error": "not_found", "message": "..."}`
 
 - Sentence-length spread: whether lengths vary, or stay about the same.
 - Type-token ratio: unique words divided by total words.
-- Punctuation density: how much punctuation there is for the length, counting semicolons, dashes, and similar marks more heavily than periods.
+- Punctuation density: commas, semicolons, colons, and dashes per word. Periods are left out, because almost every sentence has one.
 
 Spread is rhythm, the ratio is vocabulary, and punctuation is the marks. Low spread, a repetitive vocabulary, and flat punctuation point toward AI, so those directions get flipped before they are combined. Otherwise a "machine-like" shape would produce a low score and disagree with signal one for the wrong reason.
 
@@ -136,9 +136,9 @@ Spread is rhythm, the ratio is vocabulary, and punctuation is the marks. Low spr
 <!-- Write the rule in words, then give the numbers. What happens when the two
      signals disagree? -->
 
-**The rule:** Both scores point the same way: higher means more likely AI. High-confidence AI only when both are high. High-confidence human only when both are low. Disagreement is uncertainty, so the combined score stays between the two signals and the label is unsure. The model signal does not get to accuse a plain human writer on its own.
+**The rule:** Both scores run from 0 to 1, and higher means more likely AI. Confidence is an equal average of the two, so it always lands between them. When the signals disagree, the result stays in the middle instead of following the model. A high-confidence AI label still requires the combined score to clear the top of the band, which means one high signal cannot get there alone.
 
-**The numbers:** Set in Milestone 4, after both signals have been run on the same four pieces and one real disagreement is written down below. The 0.5 / 0.5 weights and the 0.35 / 0.65 cutoffs currently in `config.py` are the starter placeholders.
+**The numbers:** `0.5 * model_score + 0.5 * style_score`, rounded to 4 decimals. The weights are `WEIGHT_MODEL_SIGNAL` and `WEIGHT_STYLE_SIGNAL` in `config.py`. On the two clear samples this produces about 0.61 for the generic essay and about 0.37 for the personal narrative, a gap of about 0.24. The label cutoffs are still 0.35 and 0.65. Those bands are confirmed with the three sentences in Milestone 5. At these weights both clear samples land between them, because the style score on the generic essay is only 0.47.
 
 **Where it lives:** `scoring.py::combine_signals`
 
@@ -147,7 +147,15 @@ Spread is rhythm, the ratio is vocabulary, and punctuation is the marks. Low spr
 
 **A case where my two signals split, and what my rule does with it:**
 
-Filled in Milestone 4, once signal two exists and both have scored the same text. The rule above is what that case has to obey: a split becomes unsure, not an accusation.
+`samples/borderline.json` is the generic essay rewritten with contractions, a dash, and shorter sentences.
+
+| Piece | Model | Style | Combined |
+|---|---|---|---|
+| `samples/clearly_ai.json` | 0.7544 | 0.4728 | 0.6136 |
+| `samples/clearly_human.json` | 0.4445 | 0.2943 | 0.3694 |
+| `samples/borderline.json` | 0.3489 | 0.4231 | 0.3860 |
+
+The model falls from 0.75 to 0.35. The style score only moves from 0.47 to 0.42, so it still sits with the original essay rather than with the personal narrative. The equal average is 0.3860. The edit does not get a human label from the model alone, and it does not keep the AI label from the original essay. A model weight of 0.7 would have pushed the original essay over 0.65 while style was still 0.47, so the model would have been accusing by itself.
 
 
 
@@ -195,17 +203,17 @@ $ curl -X POST http://127.0.0.1:5000/submit \
 
 ```json
 {
-  "confidence": 0.0,
-  "content_id": "42e60d13-d840-4c51-85d7-6a9469b2a589",
+  "confidence": 0.3694,
+  "content_id": "a8fcab94-4485-44a3-8c85-0430b485153c",
   "creator_id": "demo_instructor",
   "guess": "unsure",
   "label": "not built yet",
   "model_score": 0.4445,
-  "style_score": null
+  "style_score": 0.2943
 }
 ```
 
-`confidence` is still a placeholder. The real number at this stage is `model_score`. `style_score` stays null until the second signal exists.
+`confidence` is the equal average of `model_score` and `style_score`: `(0.4445 + 0.2943) / 2 = 0.3694`. `guess` and `label` are still placeholders.
 
 **An appeal**
 
@@ -233,17 +241,6 @@ $ curl "http://127.0.0.1:5000/log?limit=3"
   "entries": [
     {
       "combined_score": null,
-      "content_id": "94893b9d-58f3-454f-9caf-c11f1700ee47",
-      "creator_id": "demo_instructor",
-      "guess": null,
-      "label": null,
-      "model_score": 0.7544,
-      "status": "decided",
-      "style_score": null,
-      "timestamp": "2026-10-29T00:55:38+00:00"
-    },
-    {
-      "combined_score": null,
       "content_id": "d318774e-5a8a-4bfb-8944-cd44e9e517ed",
       "creator_id": "demo_instructor",
       "guess": "unsure",
@@ -263,12 +260,23 @@ $ curl "http://127.0.0.1:5000/log?limit=3"
       "status": "decided",
       "style_score": null,
       "timestamp": "2026-11-03T04:11:10+00:00"
+    },
+    {
+      "combined_score": 0.3694,
+      "content_id": "a8fcab94-4485-44a3-8c85-0430b485153c",
+      "creator_id": "demo_instructor",
+      "guess": "unsure",
+      "label": null,
+      "model_score": 0.4445,
+      "status": "decided",
+      "style_score": 0.2943,
+      "timestamp": "2026-11-03T04:29:36+00:00"
     }
   ]
 }
 ```
 
-The last entry is the submission above. The older line with `"guess": null` is from before the route recorded a guess.
+The last entry is the submission above. `model_score`, `style_score`, and `combined_score` are all filled in. The earlier lines are from before the style signal was wired, so those two scores are null there.
 
 ---
 

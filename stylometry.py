@@ -50,6 +50,7 @@ def words(text: str) -> list[str]:
 def sentence_length_spread(text: str) -> float:
     """
     How much sentence length varies. ← TODO
+    Coefficient of variation of sentence lengths, in words.
 
     Returns:
         A float. Decide yourself what scale it's on and which direction means
@@ -63,39 +64,47 @@ def sentence_length_spread(text: str) -> float:
     Watch the edge case: a one-sentence submission has no spread at all, and
     `stdev` raises on fewer than two values. Decide what that should return
     before the attack set decides for you.
+    
+    Higher means the lengths vary more, which is the more human-shaped
+    direction. A single sentence has no spread, so this returns 0.0. Callers
+    must not treat that 0.0 as "definitely AI" — there was nothing to compare.
     """
-    # TODO: replace this
-    return 0.0
+    lengths = [len(words(sentence)) for sentence in sentences(text)]
+    lengths = [n for n in lengths if n > 0]
+    if len(lengths) < 2:
+        return 0.0
+    mean = statistics.mean(lengths)
+    if mean == 0:
+        return 0.0
+    return statistics.stdev(lengths) / mean
 
 
 def type_token_ratio(text: str) -> float:
     """
-    Unique words over total words. ← TODO
+    Unique words over total words, from 0 to 1.
 
-    Returns:
-        A float between 0 and 1. Higher means more varied vocabulary.
-
-    Worth knowing before you rely on it: this measure falls as text gets
-    longer, because common words repeat. Two texts of different lengths aren't
-    directly comparable on it, and if your test inputs vary a lot in length,
-    that alone can look like a signal.
+    Higher means a more varied vocabulary. This falls as a text gets longer,
+    because common words repeat, so a long text and a short one are not
+    directly comparable.
     """
-    # TODO: replace this
-    return 0.0
+    tokens = words(text)
+    if not tokens:
+        return 0.0
+    return len(set(tokens)) / len(tokens)
 
 
 def punctuation_density(text: str) -> float:
     """
-    How much punctuation, relative to length. ← TODO
+    Commas, semicolons, colons, and dashes per word.
 
-    Returns:
-        A float. Whether you count all punctuation or only some kinds — commas,
-        semicolons, dashes — is a real choice. Semicolons and em dashes are
-        more interesting than full stops, because they vary more between
-        writers.
+    Periods are left out: almost every sentence has one, so they barely vary.
+    Higher means more of the marks that differ between writers.
     """
-    # TODO: replace this
-    return 0.0
+    tokens = words(text)
+    if not tokens:
+        return 0.0
+    marks = re.findall(r"[,;:—–-]", text)
+    return len(marks) / len(tokens)
 
 
 # ── Combining them ───────────────────────────────────────────────────────────
@@ -121,9 +130,29 @@ def style_signal(text: str) -> float:
     clearly human, plain conventional human writing, lightly-edited AI — before
     you trust it. Plain and ordinary, not formal: formal prose reads as *human*
     to signal one, and it is plain writing that gets accused.
+
+    Direction, before the three are averaged:
+
+      sentence_length_spread   higher = more human, so it is flipped
+      type_token_ratio         higher = more human, so it is flipped
+      punctuation_density      higher = more human, so it is flipped
+
+    Spread is divided by 0.8 and ratio and punctuation are used as-is after
+    capping, so each piece sits on 0–1 before the flip. One sentence has no
+    spread; that piece is scored 0.5 instead of "fully AI".
     """
-    # TODO: replace this
-    return 0.5
+    spread = sentence_length_spread(text)
+    if len(sentences(text)) < 2:
+        ai_spread = 0.5
+    else:
+        ai_spread = 1.0 - min(spread / 0.8, 1.0)
+
+    ai_variety = 1.0 - type_token_ratio(text)
+    # About one comma or dash every four words is a high human density.
+    ai_punctuation = 1.0 - min(punctuation_density(text) / 0.25, 1.0)
+
+    score = (ai_spread + ai_variety + ai_punctuation) / 3
+    return round(min(max(score, 0.0), 1.0), 4)
 
 
 if __name__ == "__main__":

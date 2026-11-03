@@ -227,12 +227,18 @@ def submit():
         }), 400
 
     import detector
+    import scoring
+    import stylometry
+
     try:
         model_score = detector.model_signal(text)
     except ValueError as exc:
         return jsonify({"error": "bad_request", "message": str(exc)}), 400
 
-    # Placeholder until Milestone 5 turns the score into a real label.
+    style_score = stylometry.style_signal(text)
+    # confidence is the combined score. guess and label stay placeholders
+    # until Milestone 5.
+    confidence = scoring.combine_signals(model_score, style_score)
     guess = "unsure"
     content_id = str(uuid.uuid4())
     audit.log_decision(
@@ -240,6 +246,8 @@ def submit():
         creator_id=creator_id.strip(),
         guess=guess,
         model_score=model_score,
+        style_score=style_score,
+        combined_score=confidence,
         status="decided",
     )
 
@@ -247,10 +255,10 @@ def submit():
         "content_id": content_id,
         "creator_id": creator_id.strip(),
         "guess": guess,
-        "confidence": 0.0,
+        "confidence": confidence,
         "label": "not built yet",
         "model_score": model_score,
-        "style_score": None,
+        "style_score": style_score,
     }), 200
 
 @app.post("/appeal")
