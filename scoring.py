@@ -62,7 +62,6 @@ def combine_signals(model_score: float, style_score: float) -> float:
 def score_to_label(score: float) -> tuple[str, str]:
     """
     Turn a score into a guess and the text a reader actually sees.
-    ← TODO (Milestone 5)
 
     Returns:
         (guess, label_text) — where `guess` is a short machine-readable string
@@ -85,12 +84,23 @@ def score_to_label(score: float) -> tuple[str, str]:
     think if they got it on their own work. That question is the whole
     milestone.
     """
-    # TODO: replace this — thresholds are in config.py
+    # At or below 0.35 is human. At or above 0.65 is AI. The band between
+    # them is unsure, so a score of 0.51 and a score of 0.95 are not the
+    # same sentence.
     if score >= config.AI_THRESHOLD:
-        return "ai", "PLACEHOLDER — write the high-confidence AI label."
+        return (
+            "ai",
+            "This looks like it was written by an AI. If you wrote it yourself, "
+            "appeal and say why. A person will review it, and nothing is rescored "
+            "automatically.",
+        )
     if score <= config.HUMAN_THRESHOLD:
-        return "human", "PLACEHOLDER — write the high-confidence human label."
-    return "unsure", "PLACEHOLDER — write the unsure label."
+        return "human", "We think a person wrote this."
+    return (
+        "unsure",
+        "We can't tell whether a person or an AI wrote this, so we are not "
+        "calling it either way.",
+    )
 
 
 def label_ranges() -> list[tuple[str, str]]:

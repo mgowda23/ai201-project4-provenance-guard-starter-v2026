@@ -170,14 +170,21 @@ The model falls from 0.75 to 0.35. The style score only moves from 0.47 to 0.42,
 
 | Label | Score range | The exact text a reader sees |
 |---|---|---|
-| high-confidence human |  |  |
-| unsure |  |  |
-| high-confidence AI |  |  |
+| high-confidence human | 0.00 – 0.35 | We think a person wrote this. |
+| unsure | above 0.35 and below 0.65 | We can't tell whether a person or an AI wrote this, so we are not calling it either way. |
+| high-confidence AI | 0.65 – 1.00 | This looks like it was written by an AI. If you wrote it yourself, appeal and say why. A person will review it, and nothing is rescored automatically. |
 
-**Why I worded the "unsure" one this way:**
-<!-- It's the hardest of the three. It has to admit uncertainty without
-     sounding like an accusation, because the person reading it may well have
-     written every word themselves. -->
+A score of exactly 0.35 is the human sentence. A score of exactly 0.65 is the AI sentence. `scoring.py::score_to_label` is what decides that.
+
+**Why I worded the "unsure" one this way:** My own plain paragraph scored 0.5879, so this is the sentence I would have been shown. It had to admit that the service cannot tell, without sounding like an accusation, because I wrote every word of that paragraph.
+
+All three sentences came back from real submissions. The four calibration pieces had landed between 0.37 and 0.61, so the outer labels needed more extreme text. The bands stayed at 0.35 and 0.65, because dropping the AI line under 0.59 would have called my own paragraph high-confidence AI.
+
+| Piece | Combined | Guess |
+|---|---|---|
+| `samples/label_human.json` | 0.1336 | human |
+| `samples/plain_human.json` | 0.5879 | unsure |
+| `samples/label_ai.json` | 0.9318 | ai |
 
 
 
@@ -198,85 +205,97 @@ The model falls from 0.75 to 0.35. The style score only moves from 0.47 to 0.42,
 ```bash
 $ curl -X POST http://127.0.0.1:5000/submit \
   -H "Content-Type: application/json" \
-  -d @samples/clearly_human.json
+  -d @samples/plain_human.json
 ```
 
 ```json
 {
-  "confidence": 0.3694,
-  "content_id": "a8fcab94-4485-44a3-8c85-0430b485153c",
-  "creator_id": "demo_instructor",
+  "confidence": 0.5879,
+  "content_id": "95cc4e36-fb15-4bf8-8abb-3788e4eba4e0",
+  "creator_id": "mithun",
   "guess": "unsure",
-  "label": "not built yet",
-  "model_score": 0.4445,
-  "style_score": 0.2943
+  "label": "We can't tell whether a person or an AI wrote this, so we are not calling it either way.",
+  "model_score": 0.5938,
+  "style_score": 0.582
 }
 ```
 
-`confidence` is the equal average of `model_score` and `style_score`: `(0.4445 + 0.2943) / 2 = 0.3694`. `guess` and `label` are still placeholders.
+`confidence` is `(0.5938 + 0.5820) / 2 = 0.5879`, which is inside the unsure band.
 
 **An appeal**
-
-Milestone 5. `POST /appeal` still returns 501.
 
 ```bash
 $ curl -X POST http://127.0.0.1:5000/appeal \
   -H "Content-Type: application/json" \
-  -d '{"content_id": "...", "reasoning": "..."}'
-```
-
-```json
-
-```
-
-**What the log shows afterwards**
-
-```bash
-$ curl "http://127.0.0.1:5000/log?limit=3"
+  -d '{"content_id": "95cc4e36-fb15-4bf8-8abb-3788e4eba4e0", "reasoning": "I wrote this myself while studying RAG."}'
 ```
 
 ```json
 {
-  "count": 3,
+  "content_id": "95cc4e36-fb15-4bf8-8abb-3788e4eba4e0",
+  "message": "Your appeal was recorded. A person will review it. The text was not rescored.",
+  "status": "under_review"
+}
+```
+
+An unknown `content_id` returns 404. An empty `reasoning` returns 400. Neither of those writes a log line.
+
+**What the log shows afterwards**
+
+```bash
+$ curl "http://127.0.0.1:5000/log?limit=4"
+```
+
+```json
+{
+  "count": 4,
   "entries": [
     {
-      "combined_score": null,
-      "content_id": "d318774e-5a8a-4bfb-8944-cd44e9e517ed",
-      "creator_id": "demo_instructor",
+      "combined_score": 0.5879,
+      "content_id": "95cc4e36-fb15-4bf8-8abb-3788e4eba4e0",
+      "creator_id": "mithun",
       "guess": "unsure",
-      "label": null,
-      "model_score": 0.4445,
+      "label": "We can't tell whether a person or an AI wrote this, so we are not calling it either way.",
+      "model_score": 0.5938,
       "status": "decided",
-      "style_score": null,
-      "timestamp": "2026-11-03T03:59:02+00:00"
+      "style_score": 0.582,
+      "timestamp": "2026-11-03T04:55:09+00:00"
     },
     {
-      "combined_score": null,
-      "content_id": "42e60d13-d840-4c51-85d7-6a9469b2a589",
-      "creator_id": "demo_instructor",
-      "guess": "unsure",
-      "label": null,
-      "model_score": 0.4445,
+      "combined_score": 0.1336,
+      "content_id": "e2e9849c-117d-4312-8e9e-66c8f067b1b3",
+      "creator_id": "calibration",
+      "guess": "human",
+      "label": "We think a person wrote this.",
+      "model_score": 0.0747,
       "status": "decided",
-      "style_score": null,
-      "timestamp": "2026-11-03T04:11:10+00:00"
+      "style_score": 0.1926,
+      "timestamp": "2026-11-03T04:55:09+00:00"
     },
     {
-      "combined_score": 0.3694,
-      "content_id": "a8fcab94-4485-44a3-8c85-0430b485153c",
-      "creator_id": "demo_instructor",
-      "guess": "unsure",
-      "label": null,
-      "model_score": 0.4445,
+      "combined_score": 0.9318,
+      "content_id": "5ac713b9-bd6f-4a90-bd79-588e25f8c007",
+      "creator_id": "calibration",
+      "guess": "ai",
+      "label": "This looks like it was written by an AI. If you wrote it yourself, appeal and say why. A person will review it, and nothing is rescored automatically.",
+      "model_score": 0.9655,
       "status": "decided",
-      "style_score": 0.2943,
-      "timestamp": "2026-11-03T04:29:36+00:00"
+      "style_score": 0.8981,
+      "timestamp": "2026-11-03T04:55:09+00:00"
+    },
+    {
+      "content_id": "95cc4e36-fb15-4bf8-8abb-3788e4eba4e0",
+      "creator_id": "mithun",
+      "event": "appeal",
+      "reasoning": "I wrote this myself while studying RAG.",
+      "status": "under_review",
+      "timestamp": "2026-11-03T04:55:09+00:00"
     }
   ]
 }
 ```
 
-The last entry is the submission above. `model_score`, `style_score`, and `combined_score` are all filled in. The earlier lines are from before the style signal was wired, so those two scores are null there.
+The first entry is the submission above. The next two are the human and AI labels. The last entry is the appeal: same `content_id`, status `under_review`, and the original decision is still the line above it. The text was not rescored.
 
 ---
 
