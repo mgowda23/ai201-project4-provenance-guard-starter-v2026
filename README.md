@@ -303,15 +303,15 @@ The first entry is the submission above. The next two are the human and AI label
 
 **Moment 1**
 
-- *What I asked for:*
-- *What came back:*
-- *What I changed:*
+- *What I asked for:* Whether five targets I had already chosen could be checked by someone who could not ask me what I meant. The targets were mine: at most 3 of 10 of my own pieces labeled high-confidence AI, a gap of at least 0.15, all 3 labels coming back, an appeal that sets `under_review`, and a 400 for missing, empty, or over-long text.
+- *What came back:* The numbers were checkable once the two clear pieces were named and each score target had to hold in each of 3 runs. A single lucky run would not have been enough.
+- *What I changed:* I kept my numbers, including 3 of 10 rather than the course example of 1 of 10, because plain prose can look predictable to this detector. I named `samples/clearly_ai.json` and `samples/clearly_human.json` in criterion 2, and I required the label check in each of 3 runs. I did not let the targets themselves be replaced.
 
 **Moment 2**
 
-- *What I asked for:*
-- *What came back:*
-- *What I changed:*
+- *What I asked for:* How to combine the two signals after they had both scored the same three pieces. On the lightly edited essay the model was 0.3489 and the style score was 0.4231.
+- *What came back:* An equal average, `0.5 * model_score + 0.5 * style_score`, so that split lands near 0.39 instead of following the model. A model weight of 0.7 would have pushed the generic essay over 0.65 while its style score was still 0.47.
+- *What I changed:* I kept 0.5 and 0.5 in `config.py`, and left `scoring.py::combine_signals` as that average. I did not raise the model weight.
 
 <!-- ═══════════════════════ UNIT 8 — THE TEST ═══════════════════════ -->
 
