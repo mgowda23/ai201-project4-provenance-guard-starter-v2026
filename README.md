@@ -190,14 +190,26 @@ Filled in Milestone 4, once signal two exists and both have scored the same text
 ```bash
 $ curl -X POST http://127.0.0.1:5000/submit \
   -H "Content-Type: application/json" \
-  -d '{"text": "...", "creator_id": "..."}'
+  -d @samples/clearly_human.json
 ```
 
 ```json
-
+{
+  "confidence": 0.0,
+  "content_id": "42e60d13-d840-4c51-85d7-6a9469b2a589",
+  "creator_id": "demo_instructor",
+  "guess": "unsure",
+  "label": "not built yet",
+  "model_score": 0.4445,
+  "style_score": null
+}
 ```
 
+`confidence` is still a placeholder. The real number at this stage is `model_score`. `style_score` stays null until the second signal exists.
+
 **An appeal**
+
+Milestone 5. `POST /appeal` still returns 501.
 
 ```bash
 $ curl -X POST http://127.0.0.1:5000/appeal \
@@ -216,8 +228,47 @@ $ curl "http://127.0.0.1:5000/log?limit=3"
 ```
 
 ```json
-
+{
+  "count": 3,
+  "entries": [
+    {
+      "combined_score": null,
+      "content_id": "94893b9d-58f3-454f-9caf-c11f1700ee47",
+      "creator_id": "demo_instructor",
+      "guess": null,
+      "label": null,
+      "model_score": 0.7544,
+      "status": "decided",
+      "style_score": null,
+      "timestamp": "2026-10-29T00:55:38+00:00"
+    },
+    {
+      "combined_score": null,
+      "content_id": "d318774e-5a8a-4bfb-8944-cd44e9e517ed",
+      "creator_id": "demo_instructor",
+      "guess": "unsure",
+      "label": null,
+      "model_score": 0.4445,
+      "status": "decided",
+      "style_score": null,
+      "timestamp": "2026-11-03T03:59:02+00:00"
+    },
+    {
+      "combined_score": null,
+      "content_id": "42e60d13-d840-4c51-85d7-6a9469b2a589",
+      "creator_id": "demo_instructor",
+      "guess": "unsure",
+      "label": null,
+      "model_score": 0.4445,
+      "status": "decided",
+      "style_score": null,
+      "timestamp": "2026-11-03T04:11:10+00:00"
+    }
+  ]
+}
 ```
+
+The last entry is the submission above. The older line with `"guess": null` is from before the route recorded a guess.
 
 ---
 

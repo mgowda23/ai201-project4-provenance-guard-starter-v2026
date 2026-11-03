@@ -199,18 +199,59 @@ def submit():
     what should this do when `text` is missing, empty, or enormous? A crash on
     a malformed input is one of the most common real failures there is.
     """
-    payload = request.get_json(silent=True) or {}
+    payload = request.get_json(silent=True)
+    if not isinstance(payload, dict):
+        return jsonify({
+            "error": "bad_request",
+            "message": "Send a JSON object with \"text\" and \"creator_id\".",
+        }), 400
 
-    # TODO: delete this and build the route.
+    text = payload.get("text")
+    creator_id = payload.get("creator_id")
+
+    # Reject bad input before the model runs, and do not log a decision for it.
+    if not isinstance(text, str) or not text.strip():
+        return jsonify({
+            "error": "bad_request",
+            "message": "Send JSON with a non-empty \"text\".",
+        }), 400
+    if not isinstance(creator_id, str) or not creator_id.strip():
+        return jsonify({
+            "error": "bad_request",
+            "message": "Send JSON with a non-empty \"creator_id\".",
+        }), 400
+    if len(text) > 4000:
+        return jsonify({
+            "error": "bad_request",
+            "message": "Text must be 4,000 characters or fewer.",
+        }), 400
+
+    import detector
+    try:
+        model_score = detector.model_signal(text)
+    except ValueError as exc:
+        return jsonify({"error": "bad_request", "message": str(exc)}), 400
+
+    # Placeholder until Milestone 5 turns the score into a real label.
+    guess = "unsure"
+    content_id = str(uuid.uuid4())
+    audit.log_decision(
+        content_id=content_id,
+        creator_id=creator_id.strip(),
+        guess=guess,
+        model_score=model_score,
+        status="decided",
+    )
+
     return jsonify({
-        "error": "not_implemented",
-        "message": "POST /submit isn't built yet — see the TODO in app.py.",
-        "you_sent": {
-            "text_length": len(payload.get("text", "")),
-            "creator_id": payload.get("creator_id"),
-        },
-    }), 501
-
+        "content_id": content_id,
+        "creator_id": creator_id.strip(),
+        "guess": guess,
+        "confidence": 0.0,
+        "label": "not built yet",
+        "model_score": model_score,
+        "style_score": None,
+    }), 200
 
 @app.post("/appeal")
 def appeal():
