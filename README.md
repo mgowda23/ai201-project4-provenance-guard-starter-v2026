@@ -319,17 +319,18 @@ The first entry is the submission above. The next two are the human and AI label
 
 ## Rate Limiting
 
-**My limits:** ___ per minute, ___ per day
+**My limits:** 10 per minute, 200 per day
 
 **Why those numbers and not others:**
-<!-- Think about two people: a real writer submitting their own work a few
-     times an hour, and a script sending a thousand variations to map your
-     thresholds. Your numbers have to be liveable for the first and hostile to
-     the second. -->
+Ten submissions per minute gives a real writer enough room to submit or retry
+several pieces without being blocked. It is low enough to slow a script that
+sends many variations to map the thresholds. The 200-per-day limit allows
+normal daily use while preventing unlimited automated probing.
 
-**What a caller counts as:** <!-- per address, or per creator_id? They fail
-differently — one script can look like a thousand callers, and one household
-can look like one. -->
+**What a caller counts as:** A caller is counted by `creator_id` when it is a
+non-empty string. Malformed requests without a usable `creator_id` fall back
+to the remote address. This limits normal creator-level submissions while
+still limiting malformed traffic from one address.
 
 **The run of status codes when I pushed past it:**
 
@@ -346,18 +347,101 @@ can look like one. -->
 <!-- Every attack with its outcome and a held-or-broke mark.
      `run_attacks.py --label before` produces the table. -->
 
+The complete run contained 56 attacks. `HELD` means the service resisted the
+attack's target; `BROKE` means the target was achieved.
 
+| ID | Family | Targeting | Status | Guess | Score | Verdict |
+|---|---|---|---:|---|---:|---|
+| EV01 | evasion | typos raise word variety | 200 | unsure | 0.372 | BROKE |
+| EV02 | evasion | broken-up sentences raise length spread | 200 | unsure | 0.464 | BROKE |
+| EV03 | evasion | pasted quotation changes the shape | 200 | unsure | 0.569 | BROKE |
+| EV04 | evasion | unusual words raise perplexity | 200 | unsure | 0.585 | BROKE |
+| EV05 | evasion | heavy human editing pass | 200 | human | 0.335 | BROKE |
+| EV06 | evasion | one long and one short sentence | 200 | unsure | 0.473 | BROKE |
+| EV07 | evasion | padding with punctuation | 200 | unsure | 0.430 | BROKE |
+| EV08 | evasion | text below token window | 200 | unsure | 0.397 | BROKE |
+| EV09 | evasion | human opening added to AI text | 200 | unsure | 0.578 | BROKE |
+| EV10 | evasion | repeated stanza structure | 200 | ai | 0.854 | HELD |
+| FP01 | false_positive | plain human writing | 200 | unsure | 0.582 | HELD |
+| FP02 | false_positive | formal human register | 200 | ai | 0.692 | BROKE |
+| FP03 | false_positive | careful non-native English writing | 200 | ai | 0.714 | BROKE |
+| FP04 | false_positive | student essay written to rubric | 200 | ai | 0.696 | BROKE |
+| FP05 | false_positive | technical documentation | 200 | ai | 0.726 | BROKE |
+| FP06 | false_positive | person imitating a formal template | 200 | ai | 0.700 | BROKE |
+| FP07 | false_positive | deliberate repeated phrase | 200 | ai | 0.690 | BROKE |
+| FP08 | false_positive | short genuine human submission | 200 | unsure | 0.404 | HELD |
+| PI01 | prompt_injection | instruction to ignore check | 200 | unsure | 0.438 | HELD |
+| PI02 | prompt_injection | instruction disguised as system message | 200 | human | 0.278 | HELD |
+| PI03 | prompt_injection | instruction in writer's voice | 200 | unsure | 0.562 | HELD |
+| PI04 | prompt_injection | make label text hostile | 200 | unsure | 0.497 | HELD |
+| PI05 | prompt_injection | inject into audit log | 200 | unsure | 0.427 | HELD |
+| PI06 | prompt_injection | instruction plus human text | 200 | unsure | 0.556 | HELD |
+| MF01 | malformed | whitespace-only text | 400 | — | — | HELD |
+| MF02 | malformed | single-character text | 400 | — | — | HELD |
+| MF03 | malformed | control characters | 200 | human | 0.250 | BROKE |
+| MF04 | malformed | punctuation-only text | 200 | unsure | 0.506 | BROKE |
+| MF05 | malformed | very long single word | 200 | ai | 0.749 | BROKE |
+| MF06 | malformed | emoji-only text | 200 | ai | 0.915 | BROKE |
+| MF07 | malformed | right-to-left script | 200 | ai | 0.870 | BROKE |
+| MF08 | malformed | 60,000-character text | 400 | — | — | HELD |
+| RQ01 | malformed | no text field | 400 | — | — | HELD |
+| RQ02 | malformed | no creator_id | 400 | — | — | HELD |
+| RQ03 | malformed | text is a number | 400 | — | — | HELD |
+| RQ04 | malformed | text is a list | 400 | — | — | HELD |
+| RQ05 | malformed | text is null | 400 | — | — | HELD |
+| RQ06 | malformed | creator_id is an object | 400 | — | — | HELD |
+| RQ07 | malformed | JSON array body | 400 | — | — | HELD |
+| RQ08 | malformed | unparseable JSON | 400 | — | — | HELD |
+| RQ09 | malformed | empty body | 400 | — | — | HELD |
+| RQ10 | malformed | form-encoded body | 400 | — | — | HELD |
+| RQ11 | malformed | JSON claiming to be plain text | 400 | — | — | HELD |
+| RQ12 | malformed | deeply nested JSON | 400 | — | — | HELD |
+| FL01_01 | flood_same_creator | 20 rapid submissions | 200 | human | 0.264 | BROKE |
+| FL01_02 | flood_same_creator | 20 rapid submissions | 200 | human | 0.264 | BROKE |
+| FL01_03 | flood_same_creator | 20 rapid submissions | 200 | human | 0.264 | BROKE |
+| FL01_04 | flood_same_creator | 20 rapid submissions | 200 | human | 0.264 | BROKE |
+| FL01_05 | flood_same_creator | 20 rapid submissions | 200 | human | 0.264 | BROKE |
+| FL01_06 | flood_same_creator | 20 rapid submissions | 200 | human | 0.264 | BROKE |
+| FL01_07 | flood_same_creator | 20 rapid submissions | 200 | human | 0.264 | BROKE |
+| FL01_08 | flood_same_creator | 20 rapid submissions | 200 | human | 0.264 | BROKE |
+| FL01_09 | flood_same_creator | 20 rapid submissions | 200 | human | 0.264 | BROKE |
+| FL01_10 | flood_same_creator | 20 rapid submissions | 200 | human | 0.264 | BROKE |
+| FL01_11 | flood_same_creator | 20 rapid submissions | 429 | — | — | HELD |
+| FL01_12 | flood_same_creator | 20 rapid submissions | 429 | — | — | HELD |
+
+| Family | Total | Held | Broke |
+|---|---:|---:|---:|
+| Evasion | 10 | 1 | 9 |
+| False positive | 8 | 2 | 6 |
+| Prompt injection | 6 | 6 | 0 |
+| Malformed | 20 | 15 | 5 |
+| Flood | 12 | 2 | 10 |
+| **Total** | **56** | **26** | **30** |
 
 **Ten audit log entries from the run**
 
 <!-- Choose entries that show the interesting failures, not the ten easiest. -->
 
 ```json
-
+{"timestamp":"2026-11-05T02:24:18+00:00","content_id":"b7ad7dd4-9e2c-4a67-b2bc-eebfe0048604","creator_id":"attacker_EV01","guess":"unsure","model_score":0.1635,"style_score":0.5801,"combined_score":0.3718,"label":"We can't tell whether a person or an AI wrote this, so we are not calling it either way.","status":"decided"}
+{"timestamp":"2026-11-05T02:24:19+00:00","content_id":"5cffed68-2cb6-4248-9a8d-e8fb63c4fc9b","creator_id":"attacker_EV10","guess":"ai","model_score":0.9792,"style_score":0.729,"combined_score":0.8541,"label":"This looks like it was written by an AI. If you wrote it yourself, appeal and say why. A person will review it, and nothing is rescored automatically.","status":"decided"}
+{"timestamp":"2026-11-05T02:24:19+00:00","content_id":"2c56dc93-7e5d-4deb-97a0-22139023414c","creator_id":"attacker_FP02","guess":"ai","model_score":0.7387,"style_score":0.6455,"combined_score":0.6921,"label":"This looks like it was written by an AI. If you wrote it yourself, appeal and say why. A person will review it, and nothing is rescored automatically.","status":"decided"}
+{"timestamp":"2026-11-05T02:24:19+00:00","content_id":"07ef9b2c-2047-49f4-8248-9caf4ccf5ede","creator_id":"attacker_FP03","guess":"ai","model_score":0.8051,"style_score":0.6223,"combined_score":0.7137,"label":"This looks like it was written by an AI. If you wrote it yourself, appeal and say why. A person will review it, and nothing is rescored automatically.","status":"decided"}
+{"timestamp":"2026-11-05T02:24:20+00:00","content_id":"9b54e90e-f48a-4e66-b994-2193db695e75","creator_id":"attacker_PI01","guess":"unsure","model_score":0.4625,"style_score":0.4128,"combined_score":0.4376,"label":"We can't tell whether a person or an AI wrote this, so we are not calling it either way.","status":"decided"}
+{"timestamp":"2026-11-05T02:24:20+00:00","content_id":"7c2a68f0-00b5-4106-b802-d25b99851c95","creator_id":"attacker_PI05","guess":"unsure","model_score":0.6401,"style_score":0.2147,"combined_score":0.4274,"label":"We can't tell whether a person or an AI wrote this, so we are not calling it either way.","status":"decided"}
+{"timestamp":"2026-11-05T02:24:20+00:00","content_id":"7a736452-d155-43b9-bec3-58ec4e8ace9c","creator_id":"attacker_MF03","guess":"human","model_score":0.0,"style_score":0.5,"combined_score":0.25,"label":"We think a person wrote this.","status":"decided"}
+{"timestamp":"2026-11-05T02:24:20+00:00","content_id":"c77bcbff-09b6-4034-b64d-7ee360285046","creator_id":"attacker_MF05","guess":"ai","model_score":0.9976,"style_score":0.5,"combined_score":0.7488,"label":"This looks like it was written by an AI. If you wrote it yourself, appeal and say why. A person will review it, and nothing is rescored automatically.","status":"decided"}
+{"timestamp":"2026-11-05T02:15:54+00:00","creator_id":"flood_tester","event":"rejected","status":"rejected","reason":"rate_limited","limit":"10 per 1 minute"}
 ```
-
 **The single worst outcome** — the one I'd least want to explain to a writer
 whose work got caught by it:
+
+FP03 was the worst outcome. It represented a non-native English speaker's
+careful human writing, but the service returned `ai` with confidence 0.7137.
+The model score was 0.8051 and the style score was 0.6223; the equal-weight
+combining rule produced a combined score above the 0.65 AI threshold. This
+would be difficult to defend because the signals measured predictability and
+surface style, not authorship.
 
 
 
