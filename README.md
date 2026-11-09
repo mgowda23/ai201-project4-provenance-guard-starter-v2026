@@ -735,7 +735,7 @@ this run favors protecting writers.
        [x] The attack set run IN FULL, every input with an outcome
        [x] Ten audit log entries pasted as text
        [x] Five criteria across three trials
-       [x] A diagnosis for every miss and every broken attack — sage AND mechanism
+       [x] A diagnosis for every miss and every broken attack — stage AND mechanism
        [x] One improvement, with Attack Run — After
        [x] What's Still Broken, including the production trade
        [x] At least four new commits
