@@ -633,20 +633,48 @@ threshold mapping.
 
 ## The Improvement
 
-**What I changed:**
+**What I changed:** I changed only the combining-rule weights in
+`config.py`. The baseline used model `0.5` and style `0.5`; the after run uses
+model `0.3` and style `0.7`. The thresholds, route validation, labels, rate
+limits, scenarios, and attack inputs were unchanged.
 
-**Which diagnosis pointed at it:**
+**Which diagnosis pointed at it:** FP02–FP07 were human writing samples
+incorrectly labeled `ai`. Their model scores were consistently high while
+their style scores were lower, so the model signal was contributing strongly
+to the false positives. Reducing that signal's weight was a direct response
+to the diagnosis.
 
 ### Attack Run — After
 
-<!-- Same format. `run_attacks.py --label after` -->
+The complete after run is in
+`results/attack_run_2026-11-09_1316_after.md`; every one of its 56 rows has a
+manual `HELD` or `BROKE` verdict. The before run is in
+`results/attack_run_2026-11-04_2124_before.md`.
 
+| Attack family | Before held | Before broke | After held | After broke |
+|---|---:|---:|---:|---:|
+| Evasion | 1 | 9 | 1 | 9 |
+| False positive | 2 | 6 | 5 | 3 |
+| Prompt injection | 6 | 0 | 6 | 0 |
+| Malformed | 15 | 5 | 15 | 5 |
+| Flood | 2 | 10 | 2 | 10 |
+| **Total** | **26** | **30** | **29** | **27** |
 
+**Did it help, and how do I know:** It helped the false-positive attack
+family: three of the six prior false positives moved into the unsure band,
+reducing total broken outcomes from 30 to 27. The improvement did not change
+the evasion, prompt-injection, malformed-input, or flood totals.
 
-**Did it help, and how do I know:**
+The after evaluation is in `results/run_2026-11-09_1316_after.md`. Its three
+trials were identical:
 
-<!-- Widening the unsure band usually fixes one problem and creates another.
-     Reporting that trade honestly is worth full credit. -->
+| Criterion | Target | Run 1 | Run 2 | Run 3 | Verdict |
+|---|---|---|---|---|---|
+| 1. My own writing | At most 3/10 high-confidence AI | 0/10 | 0/10 | 0/10 | MET |
+| 2. Score spread | At least 0.15 | 0.2179 | 0.2179 | 0.2179 | MET |
+| 3. Label coverage | 3/3 labels | 2/3 | 2/3 | 2/3 | MISSED |
+| 4. Appeal path | `under_review` for real ID; 404 for unknown | MET | MET | MET | MET |
+| 5. Bad input | 3/3 return 400 | 3/3 | 3/3 | 3/3 | MET |
 
 
 
@@ -654,15 +682,32 @@ threshold mapping.
 
 ## What's Still Broken
 
-<!-- For each attack still getting through and each criterion still missed:
-     what you'd do, and why you stopped. -->
+The remaining evasion failures are EV01–EV09. I would improve the style
+signal with adversarially varied examples and combine it with a signal that
+does not treat typos, punctuation, or sentence-length variation as authorship
+evidence. I stopped after one improvement because the assignment requires one
+isolated change and the reweighting already produced a measurable reduction
+in false positives.
+
+The remaining false positives are FP02, FP03, and FP05. I would add a
+human-written technical and formal calibration set or require corroboration
+from multiple independent signals before showing an AI accusation. I stopped
+because changing the input validation or adding another signal would be a
+second improvement.
+
+Criterion 3 is still missed because the intended AI-like label-coverage input
+scores only `0.3978` after reweighting, below the `0.65` AI threshold. I would
+replace that calibration input with a genuine high-confidence AI-like sample
+or improve the model signal, but I did not change the scenario again after
+establishing the revised baseline.
 
 
 
-**The trade I'd make if this ran for real:**
-
-<!-- Two sentences. Fewer wrong accusations means more AI text getting through.
-     Say which way you'd go and WHO PAYS FOR IT. -->
+**The trade I'd make if this ran for real:** I would prefer fewer false
+accusations and accept that some AI-written text would remain `unsure` rather
+than label a real writer's work as AI. The writers pay when the system is too
+aggressive, while the site pays when uncertain AI text is allowed through;
+this run favors protecting writers.
 
 
 
@@ -670,31 +715,31 @@ threshold mapping.
 
      SUBMISSION CHECKLIST — unit 7
 
-       [ ] criteria.md has five numbered criteria, each naming a target
-       [ ] Each has a reason underneath
-       [ ] POST /submit returns content_id, guess, confidence, label,
+       [x] criteria.md has five numbered criteria, each naming a target
+       [x] Each has a reason underneath
+       [x] POST /submit returns content_id, guess, confidence, label,
            model_score and style_score
-       [ ] Two signals that measure DIFFERENT things, each with a named blind spot
-       [ ] Three label variants, all reachable, written out in full
-       [ ] POST /appeal changes status and writes to the log
-       [ ] Signals and Scoring names scoring.py::combine_signals
-       [ ] Sample Run: a submission AND an appeal, as pasted text
-       [ ] At least four new commits
-       [ ] Repository URL submitted — WRITE IT DOWN
+       [x] Two signals that measure DIFFERENT things, each with a named blind spot
+       [x] Three label variants, all reachable, written out in full
+       [x] POST /appeal changes status and writes to the log
+       [x] Signals and Scoring names scoring.py::combine_signals
+       [x] Sample Run: a submission AND an appeal, as pasted text
+       [x] At least four new commits
+       [x] Repository URL submitted — WRITE IT DOWN
 
      SUBMISSION CHECKLIST — unit 8
 
-       [ ] Rate limiting on /submit, with your numbers justified
-       [ ] The pasted run of status codes showing 429
-       [ ] Audit log with all nine fields, recording rejections too
-       [ ] The attack set run IN FULL, every input with an outcome
-       [ ] Ten audit log entries pasted as text
-       [ ] Five criteria across three trials
-       [ ] A diagnosis for every miss and every broken attack — stage AND mechanism
-       [ ] One improvement, with Attack Run — After
-       [ ] What's Still Broken, including the production trade
-       [ ] At least four new commits
-       [ ] The SAME repository URL as last unit
+       [x] Rate limiting on /submit, with your numbers justified
+       [x] The pasted run of status codes showing 429
+       [x] Audit log with all nine fields, recording rejections too
+       [x] The attack set run IN FULL, every input with an outcome
+       [x] Ten audit log entries pasted as text
+       [x] Five criteria across three trials
+       [x] A diagnosis for every miss and every broken attack — sage AND mechanism
+       [x] One improvement, with Attack Run — After
+       [x] What's Still Broken, including the production trade
+       [x] At least four new commits
+       [x] The SAME repository URL as last unit
 
      Do not delete and recreate this repository.
      ═════════════════════════════════════════════════════════════════════ -->

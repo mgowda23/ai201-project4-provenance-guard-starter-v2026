@@ -59,8 +59,8 @@ DETECTOR_MAX_TOKENS = 400
 # model weight above 0.5 let the generic essay cross 0.65 while style was
 # still near 0.47, which would accuse on one signal.
 
-WEIGHT_MODEL_SIGNAL = 0.5
-WEIGHT_STYLE_SIGNAL = 0.5
+WEIGHT_MODEL_SIGNAL = 0.3
+WEIGHT_STYLE_SIGNAL = 0.7
 
 
 # ─── Thresholds (Milestone 5) ────────────────────────────────────────────────
