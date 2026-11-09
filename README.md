@@ -449,30 +449,39 @@ surface style, not authorship.
 
 ## Run Log and Verdicts
 
-<!-- Your five criteria across three trials. `run_eval.py --label before`. -->
+The first Milestone 3 run included technical explanations that I could not
+confirm were written entirely in my own words. Because Criterion 1 measures
+false positives on my own writing, I replaced those samples with genuine
+personal messages and notes and reran all five criteria three times without
+changing the service. The original run remains in
+`results/run_2026-11-09_1011_before.md` for transparency. The revised run in
+`results/run_2026-11-09_1308_before_revised.md` is the valid baseline for
+Criterion 1 and for the final before/after comparison.
 
 | Criterion | Target | Run 1 | Run 2 | Run 3 | Verdict |
 |---|---|---|---|---|---|
 | 1. My own writing | At most 3 of 10 labeled high-confidence AI | 0/10 | 0/10 | 0/10 | MET |
 | 2. Score spread | Clear AI confidence at least 0.15 above clear human confidence | 0.2442 | 0.2442 | 0.2442 | MET |
-| 3. Label coverage | Human, unsure, and AI all appear in each run | human, unsure | human, unsure | human, unsure | MISSED |
+| 3. Label coverage | Human, unsure, and AI all appear in each run | 2/3 labels | 2/3 labels | 2/3 labels | MISSED |
 | 4. Appeal path | Real ID returns under_review; unknown ID returns 404 | under_review + 404 | under_review + 404 | under_review + 404 | MET |
 | 5. Bad input | Missing, empty, and oversized text each return 400 | 3/3 | 3/3 | 3/3 | MET |
 
-**Real output from one trial**, pasted as text, naming the file and function
-that produced it:
+All three trials were identical. **Real output from Trial 1**, pasted as text
+below, came from `results/run_2026-11-09_1308_before_revised.md`, produced by
+`run_eval.py::main`. Requests were sent to `app.py::submit`, and the combined
+score came from `scoring.py::combine_signals`.
 
 ### my own writing — Trial 1
 ```json
 [
   {"status":200,"guess":"human","confidence":0.3399,"model_score":0.3257,"style_score":0.3542,"label":"We think a person wrote this.","sent":"The thing is my order has been picked up and i also have the proof whi"},
-  {"status":200,"guess":"unsure","confidence":0.38,"model_score":0.2091,"style_score":0.5508,"label":"We can't tell whether a person or an AI wrote this, so we are not calling it either way.","sent":"Usually for a 2-pointer approach we need the my understanding is that "},
+  {"status":200,"guess":"unsure","confidence":0.3852,"model_score":0.4077,"style_score":0.3627,"label":"We can't tell whether a person or an AI wrote this, so we are not calling it either way.","sent":"Reply:I'm good. You will get it.. Don't worry.  Hang in there. Are you"},
   {"status":200,"guess":"human","confidence":0.2217,"model_score":0.0175,"style_score":0.4259,"label":"We think a person wrote this.","sent":"TODAY - Solved 2 Neetcode easy questions and hopefully will remember a"},
   {"status":200,"guess":"human","confidence":0.1387,"model_score":0.0274,"style_score":0.25,"label":"We think a person wrote this.","sent":"TOMORROW - Focus on checking on more SDE roles and working on upskilli"},
   {"status":200,"guess":"human","confidence":0.3364,"model_score":0.2258,"style_score":0.447,"label":"We think a person wrote this.","sent":"5-Jan: Tried the first plan but came to conclusion that its not so eas"},
-  {"status":200,"guess":"human","confidence":0.2614,"model_score":0.0632,"style_score":0.4596,"label":"We think a person wrote this.","sent":"Apart from that when we are extending thread class, we usually extends"},
-  {"status":200,"guess":"unsure","confidence":0.5494,"model_score":0.4877,"style_score":0.6111,"label":"We can't tell whether a person or an AI wrote this, so we are not calling it either way.","sent":"Metaclass is the class of a class, it controls how class are created b"},
-  {"status":200,"guess":"unsure","confidence":0.5418,"model_score":0.5491,"style_score":0.5345,"label":"We can't tell whether a person or an AI wrote this, so we are not calling it either way.","sent":"A race condition occurs when multiple threads or processes access and "},
+  {"status":200,"guess":"unsure","confidence":0.6204,"model_score":0.76,"style_score":0.4809,"label":"We can't tell whether a person or an AI wrote this, so we are not calling it either way.","sent":"Hey, how are you? It's been more than a year. I believe you must be do"},
+  {"status":200,"guess":"human","confidence":0.273,"model_score":0.2296,"style_score":0.3164,"label":"We think a person wrote this.","sent":"Hey Jessie, Just saw the Zelle payment of 375$ come through, thank you"},
+  {"status":200,"guess":"human","confidence":0.2749,"model_score":0.1086,"style_score":0.4412,"label":"We think a person wrote this.","sent":"we are still searching for one more roomate bro dint find any, so - ch"},
   {"status":200,"guess":"unsure","confidence":0.385,"model_score":0.2199,"style_score":0.55,"label":"We can't tell whether a person or an AI wrote this, so we are not calling it either way.","sent":"I want to send a thank you for connecting message to this person and a"},
   {"status":200,"guess":"unsure","confidence":0.3891,"model_score":0.3492,"style_score":0.4289,"label":"We can't tell whether a person or an AI wrote this, so we are not calling it either way.","sent":"I want to join the kaggle Competition Launch: NFL Big Data Bowl 2027 h"}
 ]
@@ -532,6 +541,15 @@ entry.
                         signal at 0.6, so it dragged the whole score down."
 
      Look for a pattern. Five failures on one signal is one problem, not five. -->
+
+### Criterion 1 — MET
+
+The revised personal-writing set produced five `human`, five `unsure`, and
+zero `ai` labels in all three trials. It met the target of at most three
+high-confidence AI labels out of ten. The original Criterion 1 evidence is
+not used for the final baseline because two technical samples were not
+confirmed as genuine personal writing; replacing them with genuine messages
+made the criterion measure the intended population.
 
 ### Criterion 3 — MISSED
 

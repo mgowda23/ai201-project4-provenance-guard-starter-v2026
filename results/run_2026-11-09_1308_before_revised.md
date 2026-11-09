@@ -1,0 +1,651 @@
+# Run log — before_revised
+
+- Produced by: `run_eval.py::main`
+- Service: `app.py::submit` · scoring: `scoring.py::combine_signals`
+- 3 trials per criterion · 2026-11-09 13:08
+
+Fill in Target from `criteria.md`, and Run and Verdict from the output
+underneath. Whether a trial passed depends on the criterion you wrote.
+
+| Criterion | Target | Run 1 | Run 2 | Run 3 | Verdict |
+|---|---|---|---|---|---|
+| 1. my own writing |  |   |   |   |  |
+| 2. score spread between clear cases |  |   |   |   |  |
+| 3. label coverage |  |   |   |   |  |
+| 4. appeal submission |  |   |   |   |  |
+| 5. bad input |  |   |   |   |  |
+
+---
+
+## What actually came back
+
+Real output. Paste the relevant parts into your README — the rubric
+asks for the actual JSON, not a description of it.
+
+### my own writing
+
+**Trial 1**
+
+```json
+[
+  {
+    "status": 200,
+    "guess": "human",
+    "confidence": 0.3399,
+    "model_score": 0.3257,
+    "style_score": 0.3542,
+    "label": "We think a person wrote this.",
+    "sent": "The thing is my order has been picked up and i also have the proof whi"
+  },
+  {
+    "status": 200,
+    "guess": "unsure",
+    "confidence": 0.3852,
+    "model_score": 0.4077,
+    "style_score": 0.3627,
+    "label": "We can't tell whether a person or an AI wrote this, so we are not calling it either way.",
+    "sent": "Reply:I'm good. You will get it.. Don't worry.  Hang in there. Are you"
+  },
+  {
+    "status": 200,
+    "guess": "human",
+    "confidence": 0.2217,
+    "model_score": 0.0175,
+    "style_score": 0.4259,
+    "label": "We think a person wrote this.",
+    "sent": "TODAY - Solved 2 Neetcode easy questions and hopefully will remember a"
+  },
+  {
+    "status": 200,
+    "guess": "human",
+    "confidence": 0.1387,
+    "model_score": 0.0274,
+    "style_score": 0.25,
+    "label": "We think a person wrote this.",
+    "sent": "TOMORROW - Focus on checking on more SDE roles and working on upskilli"
+  },
+  {
+    "status": 200,
+    "guess": "human",
+    "confidence": 0.3364,
+    "model_score": 0.2258,
+    "style_score": 0.447,
+    "label": "We think a person wrote this.",
+    "sent": "5-Jan: Tried the first plan but came to conclusion that its not so eas"
+  },
+  {
+    "status": 200,
+    "guess": "unsure",
+    "confidence": 0.6204,
+    "model_score": 0.76,
+    "style_score": 0.4809,
+    "label": "We can't tell whether a person or an AI wrote this, so we are not calling it either way.",
+    "sent": "Hey, how are you? It's been more than a year. I believe you must be do"
+  },
+  {
+    "status": 200,
+    "guess": "human",
+    "confidence": 0.273,
+    "model_score": 0.2296,
+    "style_score": 0.3164,
+    "label": "We think a person wrote this.",
+    "sent": "Hey Jessie, Just saw the Zelle payment of 375$ come through, thank you"
+  },
+  {
+    "status": 200,
+    "guess": "human",
+    "confidence": 0.2749,
+    "model_score": 0.1086,
+    "style_score": 0.4412,
+    "label": "We think a person wrote this.",
+    "sent": "we are still searching for one more roomate bro dint find any, so - ch"
+  },
+  {
+    "status": 200,
+    "guess": "unsure",
+    "confidence": 0.385,
+    "model_score": 0.2199,
+    "style_score": 0.55,
+    "label": "We can't tell whether a person or an AI wrote this, so we are not calling it either way.",
+    "sent": "I want to send a thank you for connecting message to this person and a"
+  },
+  {
+    "status": 200,
+    "guess": "unsure",
+    "confidence": 0.3891,
+    "model_score": 0.3492,
+    "style_score": 0.4289,
+    "label": "We can't tell whether a person or an AI wrote this, so we are not calling it either way.",
+    "sent": "I want to join the kaggle Competition Launch: NFL Big Data Bowl 2027 h"
+  }
+]
+```
+
+**Trial 2**
+
+```json
+[
+  {
+    "status": 200,
+    "guess": "human",
+    "confidence": 0.3399,
+    "model_score": 0.3257,
+    "style_score": 0.3542,
+    "label": "We think a person wrote this.",
+    "sent": "The thing is my order has been picked up and i also have the proof whi"
+  },
+  {
+    "status": 200,
+    "guess": "unsure",
+    "confidence": 0.3852,
+    "model_score": 0.4077,
+    "style_score": 0.3627,
+    "label": "We can't tell whether a person or an AI wrote this, so we are not calling it either way.",
+    "sent": "Reply:I'm good. You will get it.. Don't worry.  Hang in there. Are you"
+  },
+  {
+    "status": 200,
+    "guess": "human",
+    "confidence": 0.2217,
+    "model_score": 0.0175,
+    "style_score": 0.4259,
+    "label": "We think a person wrote this.",
+    "sent": "TODAY - Solved 2 Neetcode easy questions and hopefully will remember a"
+  },
+  {
+    "status": 200,
+    "guess": "human",
+    "confidence": 0.1387,
+    "model_score": 0.0274,
+    "style_score": 0.25,
+    "label": "We think a person wrote this.",
+    "sent": "TOMORROW - Focus on checking on more SDE roles and working on upskilli"
+  },
+  {
+    "status": 200,
+    "guess": "human",
+    "confidence": 0.3364,
+    "model_score": 0.2258,
+    "style_score": 0.447,
+    "label": "We think a person wrote this.",
+    "sent": "5-Jan: Tried the first plan but came to conclusion that its not so eas"
+  },
+  {
+    "status": 200,
+    "guess": "unsure",
+    "confidence": 0.6204,
+    "model_score": 0.76,
+    "style_score": 0.4809,
+    "label": "We can't tell whether a person or an AI wrote this, so we are not calling it either way.",
+    "sent": "Hey, how are you? It's been more than a year. I believe you must be do"
+  },
+  {
+    "status": 200,
+    "guess": "human",
+    "confidence": 0.273,
+    "model_score": 0.2296,
+    "style_score": 0.3164,
+    "label": "We think a person wrote this.",
+    "sent": "Hey Jessie, Just saw the Zelle payment of 375$ come through, thank you"
+  },
+  {
+    "status": 200,
+    "guess": "human",
+    "confidence": 0.2749,
+    "model_score": 0.1086,
+    "style_score": 0.4412,
+    "label": "We think a person wrote this.",
+    "sent": "we are still searching for one more roomate bro dint find any, so - ch"
+  },
+  {
+    "status": 200,
+    "guess": "unsure",
+    "confidence": 0.385,
+    "model_score": 0.2199,
+    "style_score": 0.55,
+    "label": "We can't tell whether a person or an AI wrote this, so we are not calling it either way.",
+    "sent": "I want to send a thank you for connecting message to this person and a"
+  },
+  {
+    "status": 200,
+    "guess": "unsure",
+    "confidence": 0.3891,
+    "model_score": 0.3492,
+    "style_score": 0.4289,
+    "label": "We can't tell whether a person or an AI wrote this, so we are not calling it either way.",
+    "sent": "I want to join the kaggle Competition Launch: NFL Big Data Bowl 2027 h"
+  }
+]
+```
+
+**Trial 3**
+
+```json
+[
+  {
+    "status": 200,
+    "guess": "human",
+    "confidence": 0.3399,
+    "model_score": 0.3257,
+    "style_score": 0.3542,
+    "label": "We think a person wrote this.",
+    "sent": "The thing is my order has been picked up and i also have the proof whi"
+  },
+  {
+    "status": 200,
+    "guess": "unsure",
+    "confidence": 0.3852,
+    "model_score": 0.4077,
+    "style_score": 0.3627,
+    "label": "We can't tell whether a person or an AI wrote this, so we are not calling it either way.",
+    "sent": "Reply:I'm good. You will get it.. Don't worry.  Hang in there. Are you"
+  },
+  {
+    "status": 200,
+    "guess": "human",
+    "confidence": 0.2217,
+    "model_score": 0.0175,
+    "style_score": 0.4259,
+    "label": "We think a person wrote this.",
+    "sent": "TODAY - Solved 2 Neetcode easy questions and hopefully will remember a"
+  },
+  {
+    "status": 200,
+    "guess": "human",
+    "confidence": 0.1387,
+    "model_score": 0.0274,
+    "style_score": 0.25,
+    "label": "We think a person wrote this.",
+    "sent": "TOMORROW - Focus on checking on more SDE roles and working on upskilli"
+  },
+  {
+    "status": 200,
+    "guess": "human",
+    "confidence": 0.3364,
+    "model_score": 0.2258,
+    "style_score": 0.447,
+    "label": "We think a person wrote this.",
+    "sent": "5-Jan: Tried the first plan but came to conclusion that its not so eas"
+  },
+  {
+    "status": 200,
+    "guess": "unsure",
+    "confidence": 0.6204,
+    "model_score": 0.76,
+    "style_score": 0.4809,
+    "label": "We can't tell whether a person or an AI wrote this, so we are not calling it either way.",
+    "sent": "Hey, how are you? It's been more than a year. I believe you must be do"
+  },
+  {
+    "status": 200,
+    "guess": "human",
+    "confidence": 0.273,
+    "model_score": 0.2296,
+    "style_score": 0.3164,
+    "label": "We think a person wrote this.",
+    "sent": "Hey Jessie, Just saw the Zelle payment of 375$ come through, thank you"
+  },
+  {
+    "status": 200,
+    "guess": "human",
+    "confidence": 0.2749,
+    "model_score": 0.1086,
+    "style_score": 0.4412,
+    "label": "We think a person wrote this.",
+    "sent": "we are still searching for one more roomate bro dint find any, so - ch"
+  },
+  {
+    "status": 200,
+    "guess": "unsure",
+    "confidence": 0.385,
+    "model_score": 0.2199,
+    "style_score": 0.55,
+    "label": "We can't tell whether a person or an AI wrote this, so we are not calling it either way.",
+    "sent": "I want to send a thank you for connecting message to this person and a"
+  },
+  {
+    "status": 200,
+    "guess": "unsure",
+    "confidence": 0.3891,
+    "model_score": 0.3492,
+    "style_score": 0.4289,
+    "label": "We can't tell whether a person or an AI wrote this, so we are not calling it either way.",
+    "sent": "I want to join the kaggle Competition Launch: NFL Big Data Bowl 2027 h"
+  }
+]
+```
+
+### score spread between clear cases
+
+**Trial 1**
+
+```json
+[
+  {
+    "status": 200,
+    "guess": "unsure",
+    "confidence": 0.6136,
+    "model_score": 0.7544,
+    "style_score": 0.4728,
+    "label": "We can't tell whether a person or an AI wrote this, so we are not calling it either way.",
+    "sent": "The importance of effective time management cannot be overstated in to"
+  },
+  {
+    "status": 200,
+    "guess": "unsure",
+    "confidence": 0.3694,
+    "model_score": 0.4445,
+    "style_score": 0.2943,
+    "label": "We can't tell whether a person or an AI wrote this, so we are not calling it either way.",
+    "sent": "I didn't sleep. Not properly, anyway \u2014 I lay there listening to the bo"
+  }
+]
+```
+
+**Trial 2**
+
+```json
+[
+  {
+    "status": 200,
+    "guess": "unsure",
+    "confidence": 0.6136,
+    "model_score": 0.7544,
+    "style_score": 0.4728,
+    "label": "We can't tell whether a person or an AI wrote this, so we are not calling it either way.",
+    "sent": "The importance of effective time management cannot be overstated in to"
+  },
+  {
+    "status": 200,
+    "guess": "unsure",
+    "confidence": 0.3694,
+    "model_score": 0.4445,
+    "style_score": 0.2943,
+    "label": "We can't tell whether a person or an AI wrote this, so we are not calling it either way.",
+    "sent": "I didn't sleep. Not properly, anyway \u2014 I lay there listening to the bo"
+  }
+]
+```
+
+**Trial 3**
+
+```json
+[
+  {
+    "status": 200,
+    "guess": "unsure",
+    "confidence": 0.6136,
+    "model_score": 0.7544,
+    "style_score": 0.4728,
+    "label": "We can't tell whether a person or an AI wrote this, so we are not calling it either way.",
+    "sent": "The importance of effective time management cannot be overstated in to"
+  },
+  {
+    "status": 200,
+    "guess": "unsure",
+    "confidence": 0.3694,
+    "model_score": 0.4445,
+    "style_score": 0.2943,
+    "label": "We can't tell whether a person or an AI wrote this, so we are not calling it either way.",
+    "sent": "I didn't sleep. Not properly, anyway \u2014 I lay there listening to the bo"
+  }
+]
+```
+
+### label coverage
+
+**Trial 1**
+
+```json
+[
+  {
+    "status": 200,
+    "guess": "unsure",
+    "confidence": 0.3516,
+    "model_score": 0.2358,
+    "style_score": 0.4673,
+    "label": "We can't tell whether a person or an AI wrote this, so we are not calling it either way.",
+    "sent": "The scenarios below are drafts built around your metrics. I don\u2019t know"
+  },
+  {
+    "status": 200,
+    "guess": "human",
+    "confidence": 0.1336,
+    "model_score": 0.0747,
+    "style_score": 0.1926,
+    "label": "We think a person wrote this.",
+    "sent": "Nope. Priya \u2014 mug down, that look \u2014 caught me before I'd even sat. I t"
+  },
+  {
+    "status": 200,
+    "guess": "unsure",
+    "confidence": 0.386,
+    "model_score": 0.3489,
+    "style_score": 0.4231,
+    "label": "We can't tell whether a person or an AI wrote this, so we are not calling it either way.",
+    "sent": "Time management matters more than people admit, especially now that wo"
+  }
+]
+```
+
+**Trial 2**
+
+```json
+[
+  {
+    "status": 200,
+    "guess": "unsure",
+    "confidence": 0.3516,
+    "model_score": 0.2358,
+    "style_score": 0.4673,
+    "label": "We can't tell whether a person or an AI wrote this, so we are not calling it either way.",
+    "sent": "The scenarios below are drafts built around your metrics. I don\u2019t know"
+  },
+  {
+    "status": 200,
+    "guess": "human",
+    "confidence": 0.1336,
+    "model_score": 0.0747,
+    "style_score": 0.1926,
+    "label": "We think a person wrote this.",
+    "sent": "Nope. Priya \u2014 mug down, that look \u2014 caught me before I'd even sat. I t"
+  },
+  {
+    "status": 200,
+    "guess": "unsure",
+    "confidence": 0.386,
+    "model_score": 0.3489,
+    "style_score": 0.4231,
+    "label": "We can't tell whether a person or an AI wrote this, so we are not calling it either way.",
+    "sent": "Time management matters more than people admit, especially now that wo"
+  }
+]
+```
+
+**Trial 3**
+
+```json
+[
+  {
+    "status": 200,
+    "guess": "unsure",
+    "confidence": 0.3516,
+    "model_score": 0.2358,
+    "style_score": 0.4673,
+    "label": "We can't tell whether a person or an AI wrote this, so we are not calling it either way.",
+    "sent": "The scenarios below are drafts built around your metrics. I don\u2019t know"
+  },
+  {
+    "status": 200,
+    "guess": "human",
+    "confidence": 0.1336,
+    "model_score": 0.0747,
+    "style_score": 0.1926,
+    "label": "We think a person wrote this.",
+    "sent": "Nope. Priya \u2014 mug down, that look \u2014 caught me before I'd even sat. I t"
+  },
+  {
+    "status": 200,
+    "guess": "unsure",
+    "confidence": 0.386,
+    "model_score": 0.3489,
+    "style_score": 0.4231,
+    "label": "We can't tell whether a person or an AI wrote this, so we are not calling it either way.",
+    "sent": "Time management matters more than people admit, especially now that wo"
+  }
+]
+```
+
+### appeal submission
+
+**Trial 1**
+
+```json
+[
+  {
+    "status": 200,
+    "guess": "human",
+    "confidence": 0.3198,
+    "model_score": 0.1397,
+    "style_score": 0.5,
+    "label": "We think a person wrote this.",
+    "sent": "I wrote this sentence myself and want to verify that the appeal proces"
+  }
+]
+```
+
+**Trial 2**
+
+```json
+[
+  {
+    "status": 200,
+    "guess": "human",
+    "confidence": 0.3198,
+    "model_score": 0.1397,
+    "style_score": 0.5,
+    "label": "We think a person wrote this.",
+    "sent": "I wrote this sentence myself and want to verify that the appeal proces"
+  }
+]
+```
+
+**Trial 3**
+
+```json
+[
+  {
+    "status": 200,
+    "guess": "human",
+    "confidence": 0.3198,
+    "model_score": 0.1397,
+    "style_score": 0.5,
+    "label": "We think a person wrote this.",
+    "sent": "I wrote this sentence myself and want to verify that the appeal proces"
+  }
+]
+```
+
+### bad input
+
+**Trial 1**
+
+```json
+[
+  {
+    "status": 400,
+    "guess": null,
+    "confidence": null,
+    "model_score": null,
+    "style_score": null,
+    "label": null,
+    "sent": "{\"creator_id\": \"eval_missing_text\"}"
+  },
+  {
+    "status": 400,
+    "guess": null,
+    "confidence": null,
+    "model_score": null,
+    "style_score": null,
+    "label": null,
+    "sent": "(empty text)"
+  },
+  {
+    "status": 400,
+    "guess": null,
+    "confidence": null,
+    "model_score": null,
+    "style_score": null,
+    "label": null,
+    "sent": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+  }
+]
+```
+
+**Trial 2**
+
+```json
+[
+  {
+    "status": 400,
+    "guess": null,
+    "confidence": null,
+    "model_score": null,
+    "style_score": null,
+    "label": null,
+    "sent": "{\"creator_id\": \"eval_missing_text\"}"
+  },
+  {
+    "status": 400,
+    "guess": null,
+    "confidence": null,
+    "model_score": null,
+    "style_score": null,
+    "label": null,
+    "sent": "(empty text)"
+  },
+  {
+    "status": 400,
+    "guess": null,
+    "confidence": null,
+    "model_score": null,
+    "style_score": null,
+    "label": null,
+    "sent": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+  }
+]
+```
+
+**Trial 3**
+
+```json
+[
+  {
+    "status": 400,
+    "guess": null,
+    "confidence": null,
+    "model_score": null,
+    "style_score": null,
+    "label": null,
+    "sent": "{\"creator_id\": \"eval_missing_text\"}"
+  },
+  {
+    "status": 400,
+    "guess": null,
+    "confidence": null,
+    "model_score": null,
+    "style_score": null,
+    "label": null,
+    "sent": "(empty text)"
+  },
+  {
+    "status": 400,
+    "guess": null,
+    "confidence": null,
+    "model_score": null,
+    "style_score": null,
+    "label": null,
+    "sent": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+  }
+]
+```
