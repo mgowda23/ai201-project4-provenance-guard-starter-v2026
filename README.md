@@ -533,6 +533,82 @@ entry.
 
      Look for a pattern. Five failures on one signal is one problem, not five. -->
 
+### Criterion 3 — MISSED
+
+The label-coverage criterion was missed in all three trials. The three
+submissions returned `unsure`, `human`, and `unsure`; the AI label was never
+reached. The route accepted all three inputs correctly, and the label mapping
+itself was deterministic. The failure was upstream: the intended AI-like
+input produced a combined score of only `0.3516`, well below the
+`AI_THRESHOLD` of `0.65`, so `scoring.py::score_to_label` correctly mapped it
+to `unsure`. The scenario did not actually provide a text that reached the AI
+score band.
+
+### Broken evasion attacks
+
+EV01, EV02, EV03, EV06, and EV07 broke at signal two and then at the combining
+rule. Typos, broken-up sentences, pasted quotations, extreme sentence-length
+variation, and extra punctuation changed the text shape. The stylometry signal
+interpreted those changes as more human-like, lowering `style_score`. The
+equal-weight average then pulled the combined score into the unsure band
+instead of the AI band.
+
+EV04 and EV08 broke primarily at signal one. Unusual words raised the model's
+perplexity, and the below-window input limited how much useful evidence the
+model signal saw. Both effects lowered `model_score`. The combining rule
+averaged that lower score with the style score, so the result stayed unsure.
+
+EV05 broke at both signals and the combining rule. The heavy human-editing
+pass made the text look human to both measurements, producing a combined score
+of `0.3349` and the human label. EV09 broke because the human-written opening
+pulled the surface statistics toward human text while the AI remainder did not
+raise both signals enough; the combined score was `0.5775`, which mapped to
+unsure. EV10 was held because both signals remained high enough for a combined
+score of `0.8541` and the AI label.
+
+### Broken false-positive attacks
+
+FP02, FP03, FP04, FP05, FP06, and FP07 broke at signal one, signal two, and
+the combining rule. These were human texts written in formal, careful,
+template-like, technical, or repetitive styles. Signal one treated their
+predictable wording as AI-like, while signal two treated their regular
+surface shape as AI-like. With equal weights, the combined scores ranged from
+`0.6896` to `0.7259`, all above the `0.65` AI threshold. The label mapping
+then correctly—but wrongly for these human writers—returned `ai`. FP01 and
+FP08 were held because their combined scores stayed in the unsure band rather
+than producing a high-confidence AI accusation.
+
+### Broken malformed-content attacks
+
+MF03, MF04, MF05, MF06, and MF07 broke at the route validation stage. The
+route checks that `text` is a non-empty string and that it is no longer than
+4,000 characters, but it does not reject control characters, punctuation-only
+text, a single long word, emoji-only text, or right-to-left script. Those
+values therefore reached both signals and received ordinary decisions:
+MF03 was labeled human, MF04 unsure, and MF05–MF07 AI. The mechanism is
+insufficient semantic/content validation before scoring, not a crash in the
+signals. MF01, MF02, MF08, and RQ01–RQ12 were held because the route rejected
+them with `400` before scoring.
+
+### Broken flood requests
+
+FL01_01 through FL01_10 broke at the rate-limiting policy boundary: the
+configured limit deliberately permits ten requests per minute, so those first
+ten requests reached the route and were scored. FL01_11 and FL01_12 were held
+when the limiter returned `429`. The limiter is functioning, but the attack
+was only partially stopped because the chosen threshold allows the first ten
+requests in the window.
+
+The prompt-injection family was held. The route treated the submitted
+instructions as text, the service returned only its fixed label strings, and
+the audit log remained structured JSON. No prompt-injection row produced a
+broken outcome, so there is no prompt-injection miss to diagnose.
+
+Overall, the recurring pattern is that signal two is easy to move by changing
+surface form, signal one mistakes predictable human writing for AI writing,
+and the equal-weight combining rule passes both weaknesses directly into the
+threshold mapping.
+
 
 
 ---
